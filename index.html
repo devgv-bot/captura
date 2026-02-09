@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Subir Foto a Drive</title>
+  <title>Subir Foto</title>
 </head>
 <body>
 
@@ -10,12 +10,17 @@
 
 <input type="file" accept="image/*" capture="camera" id="foto">
 <br><br>
-<button onclick="enviar()">Subir a Drive</button>
+<button onclick="enviar()">Subir</button>
+
+<form id="form" method="POST"
+      action="https://script.google.com/macros/s/AKfycby8D5lLPtw_GfAh7uHQuOQJJYUgFceTN9DT02e9kmB2xU12lhWIiDT50kBd8m6-jpZzkg/exec">
+  <input type="hidden" name="imagen" id="imagen">
+  <input type="hidden" name="nombre" id="nombre">
+</form>
 
 <script>
 function enviar() {
   const input = document.getElementById("foto");
-
   if (!input.files.length) {
     alert("Toma una foto primero");
     return;
@@ -26,20 +31,9 @@ function enviar() {
 
   reader.onloadend = function () {
     const base64 = reader.result.split(",")[1];
-
-    fetch("https://script.google.com/macros/s/AKfycbw761WCPpJ2s0BwzeCRyGDkrDtrTD6H_29xCrj7elcNPqIeqPRjVqQlNZn9cvnFlMe90g/exec", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        imagen: base64,
-        nombre: "foto_" + Date.now() + ".jpg"
-      })
-    })
-    .then(r => r.text())
-    .then(msg => alert(msg))
-    .catch(err => alert("Error: " + err));
+    document.getElementById("imagen").value = base64;
+    document.getElementById("nombre").value = "foto_" + Date.now() + ".jpg";
+    document.getElementById("form").submit();
   };
 
   reader.readAsDataURL(file);

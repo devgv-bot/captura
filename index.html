@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Subir Foto a Drive</title>
+</head>
+<body>
+
+<h2>Tomar foto</h2>
+
+<input type="file" accept="image/*" capture="camera" id="foto">
+<br><br>
+<button onclick="enviar()">Subir a Drive</button>
+
+<script>
+function enviar() {
+  const input = document.getElementById("foto");
+
+  if (!input.files.length) {
+    alert("Toma una foto primero");
+    return;
+  }
+
+  const file = input.files[0];
+  const reader = new FileReader();
+
+  reader.onloadend = function () {
+    const base64 = reader.result.split(",")[1];
+
+    fetch("https://script.google.com/macros/s/AKfycbw761WCPpJ2s0BwzeCRyGDkrDtrTD6H_29xCrj7elcNPqIeqPRjVqQlNZn9cvnFlMe90g/exec", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        imagen: base64,
+        nombre: "foto_" + Date.now() + ".jpg"
+      })
+    })
+    .then(r => r.text())
+    .then(msg => alert(msg))
+    .catch(err => alert("Error: " + err));
+  };
+
+  reader.readAsDataURL(file);
+}
+</script>
+
+</body>
+</html>
